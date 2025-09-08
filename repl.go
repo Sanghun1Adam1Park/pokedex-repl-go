@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Sanghun1Adam1Park/pokedex-repl-go/internal/pokeapi"
+	"github.com/Sanghun1Adam1Park/pokedex-repl/internal/pokeapi"
 )
 
 func cleanInput(text string) []string {
