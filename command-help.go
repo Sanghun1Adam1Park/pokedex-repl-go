@@ -4,7 +4,7 @@ import "fmt"
 
 func commandHelp(cfg *config, args ...string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("unexpected argument")
+		return fmt.Errorf("unexpected argument. usage: help")
 	}
 
 	cliCommands := getCLICommands()

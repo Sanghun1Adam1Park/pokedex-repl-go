@@ -7,7 +7,7 @@ import (
 
 func commandExit(cfg *config, args ...string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("unexpected argument")
+		return fmt.Errorf("unexpected argument. usage: exit")
 	}
 
 	fmt.Println("Closing the Pokedex... Goodbye!")

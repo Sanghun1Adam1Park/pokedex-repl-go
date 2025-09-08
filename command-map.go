@@ -4,7 +4,7 @@ import "fmt"
 
 func commandMapF(cfg *config, args ...string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("unexpected argument")
+		return fmt.Errorf("unexpected argument. usage: map")
 	}
 
 	locations, err := cfg.pokeapiClient.GetShallowLocation(cfg.nextLocationsURL)
@@ -15,6 +15,11 @@ func commandMapF(cfg *config, args ...string) error {
 	cfg.nextLocationsURL = locations.Next
 	cfg.prevLocationsURL = locations.Prev
 
+	if cfg.nextLocationsURL == nil {
+		fmt.Println("you're on last page")
+		return nil
+	}
+
 	for _, location := range locations.Results {
 		fmt.Println(location.Name)
 	}
@@ -24,7 +29,7 @@ func commandMapF(cfg *config, args ...string) error {
 
 func commandMapB(cfg *config, args ...string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("unexpected argument")
+		return fmt.Errorf("unexpected argument. usage: mapb")
 	}
 
 	locations, err := cfg.pokeapiClient.GetShallowLocation(cfg.prevLocationsURL)
@@ -34,6 +39,11 @@ func commandMapB(cfg *config, args ...string) error {
 
 	cfg.nextLocationsURL = locations.Next
 	cfg.prevLocationsURL = locations.Prev
+
+	if cfg.prevLocationsURL == nil {
+		fmt.Println("you're on first page")
+		return nil
+	}
 
 	for _, location := range locations.Results {
 		fmt.Println(location.Name)

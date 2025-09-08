@@ -11,90 +11,62 @@ const (
 	baseURL = "https://pokeapi.co/api/v2"
 )
 
-func (c *Client) GetShallowLocation(pageUrl *string) (ShallowLocation, error) {
+func (c *Client) GetShallowLocation(pageURL *string) (ShallowLocation, error) {
 	url := baseURL + "/location-area"
-	if pageUrl != nil {
-		url = *pageUrl
+	if pageURL != nil {
+		url = *pageURL
 	}
-
-	cacheData, exist := c.cache.Get(url)
-	if exist {
-		var shallowLocation ShallowLocation
-		if err := json.Unmarshal(cacheData, &shallowLocation); err != nil {
-			return ShallowLocation{}, fmt.Errorf("decode json: %w", err)
-		}
-
-		return shallowLocation, nil
-	}
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return ShallowLocation{}, fmt.Errorf("error with request: %w", err)
-	}
-
-	res, err := c.httpClient.Do(req)
-	if err != nil {
-		return ShallowLocation{}, fmt.Errorf("error with response: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return ShallowLocation{}, fmt.Errorf("error unexpected status: %s", res.Status)
-	}
-
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return ShallowLocation{}, fmt.Errorf("error reading body: %w", err)
-	}
-
-	c.cache.Add(url, data)
-
-	var shallowLocation ShallowLocation
-	if err := json.Unmarshal(data, &shallowLocation); err != nil {
-		return ShallowLocation{}, fmt.Errorf("decode json: %w", err)
-	}
-
-	return shallowLocation, nil
+	return getResource[ShallowLocation](c, url)
 }
 
 func (c *Client) GetLocationArea(location string) (LocationArea, error) {
 	url := baseURL + "/location-area/" + location
+	return getResource[LocationArea](c, url)
+}
+
+func (c *Client) GetPokemonDetails(pokemonName string) (DetailedPokemon, error) {
+	url := baseURL + "/pokemon/" + pokemonName
+	return getResource[DetailedPokemon](c, url)
+}
+
+func getResource[T any](c *Client, url string) (T, error) {
+	var zero T
 
 	cacheData, exist := c.cache.Get(url)
 	if exist {
-		var locationArea LocationArea
-		if err := json.Unmarshal(cacheData, &locationArea); err != nil {
-			return LocationArea{}, fmt.Errorf("error decoding cache data: %w", err)
+		var t T
+		if err := json.Unmarshal(cacheData, &t); err != nil {
+			return zero, fmt.Errorf("error decoding cache data: %w", err)
 		}
-		return locationArea, nil
+		return t, nil
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return LocationArea{}, fmt.Errorf("error constructing request: %w", err)
+		return zero, fmt.Errorf("error constructing request: %w", err)
 	}
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return LocationArea{}, fmt.Errorf("error with response: %w", err)
+		return zero, fmt.Errorf("error with response: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return LocationArea{}, fmt.Errorf("error unexpected status: %s", res.Status)
+		return zero, fmt.Errorf("error unexpected status: %s", res.Status)
 	}
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return LocationArea{}, fmt.Errorf("error reading body: %w", err)
+		return zero, fmt.Errorf("error reading body: %w", err)
 	}
 
 	c.cache.Add(url, data)
 
-	var locationArea LocationArea
-	if err := json.Unmarshal(data, &locationArea); err != nil {
-		return LocationArea{}, fmt.Errorf("decode json: %w", err)
+	var t T
+	if err := json.Unmarshal(data, &t); err != nil {
+		return zero, fmt.Errorf("decode json: %w", err)
 	}
 
-	return locationArea, nil
+	return t, nil
 }

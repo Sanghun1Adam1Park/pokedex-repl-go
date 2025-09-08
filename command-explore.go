@@ -4,7 +4,7 @@ import "fmt"
 
 func commandExplore(cfg *config, args ...string) error {
 	if len(args) != 1 {
-		return fmt.Errorf("unexpected argument")
+		return fmt.Errorf("unexpected argument. usage: explore <location_name>")
 	}
 
 	location := args[0]
