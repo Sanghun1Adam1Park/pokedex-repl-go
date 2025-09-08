@@ -2,7 +2,11 @@ package main
 
 import "fmt"
 
-func commandMapF(cfg *config) error {
+func commandMapF(cfg *config, args ...string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("unexpected argument")
+	}
+
 	locations, err := cfg.pokeapiClient.GetShallowLocation(cfg.nextLocationsURL)
 	if err != nil {
 		return fmt.Errorf("error with getting shallow locaitons: %w", err)
@@ -18,7 +22,11 @@ func commandMapF(cfg *config) error {
 	return nil
 }
 
-func commandMapB(cfg *config) error {
+func commandMapB(cfg *config, args ...string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("unexpected argument")
+	}
+
 	locations, err := cfg.pokeapiClient.GetShallowLocation(cfg.prevLocationsURL)
 	if err != nil {
 		return fmt.Errorf("error with getting shallow locaitons: %w", err)

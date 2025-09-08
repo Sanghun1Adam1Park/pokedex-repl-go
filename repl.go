@@ -16,7 +16,7 @@ func cleanInput(text string) []string {
 }
 
 type config struct {
-	pokeapiClient    pokeapi.Client
+	pokeapiClient    *pokeapi.Client
 	nextLocationsURL *string
 	prevLocationsURL *string
 }
@@ -40,7 +40,7 @@ func repl(cfg *config) {
 			continue
 		}
 
-		if err := cmd.callback(cfg); err != nil {
+		if err := cmd.callback(cfg, cleanText[1:]...); err != nil {
 			fmt.Println(err)
 			continue
 		}
@@ -51,7 +51,7 @@ func repl(cfg *config) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 func getCLICommands() map[string]cliCommand {
@@ -75,6 +75,11 @@ func getCLICommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Shows previous 20 locations",
 			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Shows list of pokemone at give location, usage: explore <location_name>",
+			callback:    commandExplore,
 		},
 	}
 }
